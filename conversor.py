@@ -68,8 +68,7 @@ sheet = wb.active
 
 for file_path in pdf_files:
     # Print the selected file path
-    print("Selected File Path:", file_path)
-    print(columna1,' ',columna2)
+   
     ruta_pdf = folder_path+'\\'+ file_path
     
     #Carga de Valores Para La Carga
@@ -177,6 +176,7 @@ for file_path in pdf_files:
     fecha = ''
     Orden = ''
     Mes_Año = ''
+    Tipo_declaracion = ''
     
     
     for i in range(len(lineas_pdf)-1):
@@ -206,20 +206,28 @@ for file_path in pdf_files:
             fecha = re.search(r'Fecha:\s+([\d/]+\s+[\d:]+)', line)
             if fecha:
                 fecha = fecha.group(1)
-    
+        
+        if line.startswith("02Declaración Jurada Rectificativa 03"):
+            # Extract Contribuyente using regular expression
+            Tipo_declaracion = re.search(r'02Declaración Jurada Rectificativa 03\s+(\d+)', line)
+            if Tipo_declaracion:
+                Tipo_declaracion = Tipo_declaracion.group(1)
+
+        
+        
         
     
     # Imprimir las líneas del PDF
     
-    print(contribuyente,control,fecha,Mes_Año)
+    print(Tipo_declaracion)
      
     for linea in lineas_pdf:
-        print(linea)
+        
         for inicio, fin1, fin2 in values:
             texto_extraido = extract_text(linea, inicio, fin1, fin2)
             if texto_extraido:
                 #print(linea)
-                print(inicio+' '+fin1+' '+fin2+' '+texto_extraido)
+                #print(inicio+' '+fin1+' '+fin2+' '+texto_extraido)
                 Valores_Obtenidos.append(texto_extraido)
 
     
@@ -297,12 +305,29 @@ for file_path in pdf_files:
 
     # Copiar los datos en el excel
     
+    sheet.cell(row = 1, column = columna1).value = 'Contribuyente'
+    sheet.cell(row = 2, column = columna1).value = 'Control'
+    sheet.cell(row = 3, column = columna1).value = 'Fecha/Hora'
+    sheet.cell(row = 4, column = columna1).value = 'Numero de Orden'
+    sheet.cell(row = 5, column = columna1).value = 'Mes/Año'
+    sheet.cell(row = 6, column = columna1).value = 'Tipo Declaracion'
     
     
-    for i, dato in enumerate(datos, start=1):
+    sheet.cell(row = 1, column = columna2).value = contribuyente
+    sheet.cell(row = 2, column = columna2).value = control
+    sheet.cell(row = 3, column = columna2).value = fecha
+    sheet.cell(row = 4, column = columna2).value = Orden
+    sheet.cell(row = 5, column = columna2).value = Mes_Año
+    
+    if Tipo_declaracion == '0':
+        sheet.cell(row = 6, column = columna2).value = 'Original'
+    else:
+        sheet.cell(row = 6, column = columna2).value = 'Rectificativa'
+    
+    for i, dato in enumerate(datos, start=7):
         sheet.cell(row=i, column = columna1).value = dato
         
-    for i, dato in enumerate(Valores_Obtenidos, start=1):
+    for i, dato in enumerate(Valores_Obtenidos, start=7):
         sheet.cell(row=i,column = columna2).value = dato
     
     columna1 = columna1+2
