@@ -3,7 +3,15 @@ import re
 from openpyxl import Workbook
 import tkinter as tk
 from tkinter import filedialog
+from tkinter.filedialog import askdirectory
+import os
 
+def get_pdf_files(folder_path):
+    pdf_files = []
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith('.pdf'):
+            pdf_files.append(file_name)
+    return pdf_files
 
 def leer_pdf(ruta):
     lineas = []
@@ -43,206 +51,265 @@ def extract_text(linea, inicio, fin1, fin2):
 root = tk.Tk()
 root.withdraw()  # Hide the root window
 
-# Open the file dialog to select a file
-file_path = filedialog.askopenfilename()
+# Ask user to select a folder using a dialog box
+folder_path = askdirectory(title="Select Folder")
+if not folder_path:
+    print("No folder selected. Exiting...")
+    exit()
 
-# Print the selected file path
-print("Selected File Path:", file_path)
+pdf_files = get_pdf_files(folder_path)
 
-
-
-ruta_pdf = file_path
-#Carga de Valores Para La Carga
-Valores_Obtenidos = []
-values = [
-    ("vados con tasa del 10%10", " 22 ", " 022 "),
-    (" 22 ", "", ""),
-    (" 022 ", "", ""),
-    ("con tasa del 5%150", " 156 ", "0156 "),
-    (" 156 ", "", ""),
-    (" 0156 ", "", ""),
-    ("gravados con tasa del 5%151", " 157 ", "0157 "),
-    (" 157 ", "", ""),
-    (" 0157 ", "", ""),
-    ("no alcanzados por el Impuesto12", "", ""),
-    ("industrializacion152 ", "", ""),
-    ("bienes153 ", "", ""),
-    ("bienes 14", "", ""),
-    ("tasa del 10%15", " 23 ", "023 "),
-    (" 23 ", "", ""),
-    (" 023 ", "", ""),
-    ("proceso de elaboracion o industrializacion154", " 158 ", "0158 "),
-     (" 158 ", "", ""),
-    (" 0158 ", "", ""),
-    ("servicios155 ", " 159 ", "0159 "),
-    (" 0159 ", "", ""),
-    (" 159 ", "", ""),
-    ("Impuesto17 ", "", ""),
-    ("Inc. a+h)18", " 21 ", "021 "),
-    (" 21 ", " 24 ", "024 "),
-    (" 021 ", " 24 ", "024 "),
-    (" 24 ", "", ""),
-    (" 024 ", "", ""),
-    ("natural160", "", ""),
-    ("interno161", "", ""),
-    ("no alcanzados 26", "", ""),
-    ("(Inc. a+b+c) 27", "", ""),
-    ("industrializacion162", "", ""),
-    ("bienes 163", "", ""),
-    ("bienes 29", "", ""),
-    ("(Inc. e+f+g) 30", "", ""),
-    ("(Inc. d+h) 31", "", ""),
-    ("interno32 ", " 35 ", "035 "),
-    (" 35 ", " 38 ", "038 "),
-    (" 035 ", " 38 ", "038 "),
-    (" 038 ", "", ""),
-    (" 38 ", "", ""),
-    ("alcanzadas33", " 36 ", "036 "),
-    (" 36 ", " 39 ", "039 "),
-    (" 036 ", " 39 ", "039 "),
-    (" 39 ", "", ""),
-    (" 039 ", "", ""),
-    ("Rubro 2 Inc. a+b/ Inc. d)164", "", ""),
-    ("calculo)165", "", ""),
-    ("incobrables34", " 37 ", "037 "),
-    (" 37 ", " 42 ", "042 "),
-    (" 037 ", " 42 ", "042 "),
-    (" 42 ", "", ""),
-    (" 042 ", "", ""),
-    ("a+c+d+e)43", "", ""),
-    ("Inc. l) 44", "", ""),
-    (" Inc. f) 45", "", ""),
-    ("anterior)46", "", ""),
-    ("Inc. c 166", "", ""),
-    ("d167 ", "", ""),
-    ("e47", "", ""),
-    ("Inc. c 48", "", ""),
-    (" Exportador)49", "", ""),
-    ("(No trasladable)168", "", ""),
-    ("i) 50", "", ""),
-    ("Inc. j) 55", "", ""),
-    ("anterior)51", "", ""),
-    ("recibidas52", "", ""),
-    ("gravadas 169", "", ""),
-    ("vencimiento 56", "", ""),
-    (" a+e) 53", " 57 ", "057 "),
-    (" 57 ", "", ""),
-    (" 057 ", "", ""),
-    ("Rubro 454", "", ""),
-    ("Col. I)58", "", ""),
-    ("Impuesto59", " 65 ", "065 "),
-    (" 65 ", "", ""),
-    (" 065 ", "", ""),
-    ("Impuesto60", " 66 ", "066 "),
-    (" 66 ", "", ""),
-    (" 066 ", "", ""),
-    ("exportaciones61", "", ""),
-    ("Impuesto62", "", ""),
-    ("Impuesto63", "", ""),
-    ("IRP 64 ", "", ""),
-    ("IRP170 ", "", ""),
-    
-    
-]
-
-
-
-# Llamada a la función para leer el PDF y guardar las líneas en una lista
-lineas_pdf = leer_pdf(ruta_pdf)
-
-# Imprimir las líneas del PDF
-
-
-for linea in lineas_pdf:
-    
-    for inicio, fin1, fin2 in values:
-        texto_extraido = extract_text(linea, inicio, fin1, fin2)
-        if texto_extraido:
-            #print(linea)
-            print(inicio+' '+fin1+' '+fin2+' '+texto_extraido)
-            Valores_Obtenidos.append(texto_extraido)
+columna1 = 1
+columna2 = 2
 
 # Crear un nuevo libro de Excel y seleccionar la hoja activa
 wb = Workbook()
 sheet = wb.active
 
-# Datos que deseas copiar en la columna B
-datos = ["10",
-         "22",
-         "150",
-         "156",
-         "151",
-         "157",
-         "12",
-         "152",
-         "153",
-         "14",
-         "15",
-         "23",
-         "154",
-         "158",
-         "155",
-         "159",
-         "17",
-         "18",
-         "21",
-         "24",
-         "160",
-         "161",
-         "26",
-         "27",
-         "162",
-         "163",
-         "29",
-         "30",
-         "31",
-         "32",
-         "35",
-         "38",
-         "33",
-         "36",
-         "39",
-         "164",
-         "165",
-         "34",
-         "37",
-         "42",
-         "43",
-         "44",
-         "45",
-         "46",
-         "166",
-         "167",
-         "47",
-         "48",
-         "49",
-         "168",
-         "50",
-         "55",
-         "51",
-         "52",
-         "169",
-         "56",
-         "53",
-         "57",
-         "54",
-         "58",
-         "59",
-         "65",
-         "60",
-         "66",
-         "61",
-         "62",
-         "63",
-         "64",
-         "170"]
-
-# Copiar los datos en la columna B de Excel
-for i, dato in enumerate(datos, start=1):
-    sheet.cell(row=i, column=1).value = dato
+for file_path in pdf_files:
+    # Print the selected file path
+    print("Selected File Path:", file_path)
+    print(columna1,' ',columna2)
+    ruta_pdf = folder_path+'\\'+ file_path
     
-for i, dato in enumerate(Valores_Obtenidos, start=1):
-    sheet.cell(row=i, column=2).value = dato
+    #Carga de Valores Para La Carga
+    Valores_Obtenidos = []
+    
+    values = [
+        ("vados con tasa del 10%10", " 22 ", " 022 "),
+        (" 22 ", "", ""),
+        (" 022 ", "", ""),
+        ("con tasa del 5%150", " 156 ", "0156 "),
+        (" 156 ", "", ""),
+        (" 0156 ", "", ""),
+        ("gravados con tasa del 5%151", " 157 ", "0157 "),
+        (" 157 ", "", ""),
+        (" 0157 ", "", ""),
+        ("no alcanzados por el Impuesto12", "", ""),
+        ("industrializacion152 ", "", ""),
+        ("bienes153 ", "", ""),
+        ("bienes 14", "", ""),
+        ("tasa del 10%15", " 23 ", "023 "),
+        (" 23 ", "", ""),
+        (" 023 ", "", ""),
+        ("proceso de elaboracion o industrializacion154", " 158 ", "0158 "),
+        (" 158 ", "", ""),
+        (" 0158 ", "", ""),
+        ("servicios155 ", " 159 ", "0159 "),
+        (" 0159 ", "", ""),
+        (" 159 ", "", ""),
+        ("Impuesto17 ", "", ""),
+        ("Inc. a+h)18", " 21 ", "021 "),
+        (" 21 ", " 24 ", "024 "),
+        (" 021 ", " 24 ", "024 "),
+        (" 24 ", "", ""),
+        (" 024 ", "", ""),
+        ("natural160", "", ""),
+        ("interno161", "", ""),
+        ("no alcanzados 26", "", ""),
+        ("(Inc. a+b+c) 27", "", ""),
+        ("industrializacion162", "", ""),
+        ("bienes 163", "", ""),
+        ("bienes 29", "", ""),
+        ("(Inc. e+f+g) 30", "", ""),
+        ("(Inc. d+h) 31", "", ""),
+        ("interno32 ", " 35 ", "035 "),
+        (" 35 ", " 38 ", "038 "),
+        (" 035 ", " 38 ", "038 "),
+        (" 038 ", "", ""),
+        (" 38 ", "", ""),
+        ("alcanzadas33", " 36 ", "036 "),
+        (" 36 ", " 39 ", "039 "),
+        (" 036 ", " 39 ", "039 "),
+        (" 39 ", "", ""),
+        (" 039 ", "", ""),
+        ("Rubro 2 Inc. a+b/ Inc. d)164", "", ""),
+        ("calculo)165", "", ""),
+        ("incobrables34", " 37 ", "037 "),
+        (" 37 ", " 42 ", "042 "),
+        (" 037 ", " 42 ", "042 "),
+        (" 42 ", "", ""),
+        (" 042 ", "", ""),
+        ("a+c+d+e)43", "", ""),
+        ("Inc. l) 44", "", ""),
+        (" Inc. f) 45", "", ""),
+        ("anterior)46", "", ""),
+        ("Inc. c 166", "", ""),
+        ("d167 ", "", ""),
+        ("e47", "", ""),
+        ("Inc. c 48", "", ""),
+        (" Exportador)49", "", ""),
+        ("(No trasladable)168", "", ""),
+        ("i) 50", "", ""),
+        ("Inc. j) 55", "", ""),
+        ("anterior)51", "", ""),
+        ("recibidas52", "", ""),
+        ("gravadas 169", "", ""),
+        ("vencimiento 56", "", ""),
+        (" a+e) 53", " 57 ", "057 "),
+        (" 57 ", "", ""),
+        (" 057 ", "", ""),
+        ("Rubro 454", "", ""),
+        ("Col. I)58", "", ""),
+        ("Impuesto59", " 65 ", "065 "),
+        (" 65 ", "", ""),
+        (" 065 ", "", ""),
+        ("Impuesto60", " 66 ", "066 "),
+        (" 66 ", "", ""),
+        (" 066 ", "", ""),
+        ("exportaciones61", "", ""),
+        ("Impuesto62", "", ""),
+        ("Impuesto63", "", ""),
+        ("IRP 64 ", "", ""),
+        ("IRP170 ", "", ""),
+        
+        
+    ]
+
+
+
+    # Llamada a la función para leer el PDF y guardar las líneas en una lista
+    lineas_pdf = leer_pdf(ruta_pdf)
+    
+    #Obtener datos de Cabecera
+    contribuyente = ''
+    control = ''
+    fecha = ''
+    Orden = ''
+    Mes_Año = ''
+    
+    
+    for i in range(len(lineas_pdf)-1):
+        if lineas_pdf[i].startswith("Mes Año"):
+            Mes_Año = lineas_pdf[i+1]
+            break
+    
+    for line in lineas_pdf:
+        
+        if line.startswith("Número de Orden"):
+            Orden = re.search(r'Número de Orden\s+(\d+)', line)
+            if Orden:
+                Orden = Orden.group(1)
+            
+        if line.startswith("Formulario"):
+            # Extract Contribuyente using regular expression
+            contribuyente = re.search(r'Contribuyente:\s+(\d+)', line)
+            if contribuyente:
+                contribuyente = contribuyente.group(1)
+
+            # Extract Control using regular expression
+            control = re.search(r'Control:\s+(\w+)', line)
+            if control:
+                control = control.group(1)
+
+            # Extract Fecha using regular expression
+            fecha = re.search(r'Fecha:\s+([\d/]+\s+[\d:]+)', line)
+            if fecha:
+                fecha = fecha.group(1)
+    
+        
+    
+    # Imprimir las líneas del PDF
+    
+    print(contribuyente,control,fecha,Mes_Año)
+     
+    for linea in lineas_pdf:
+        print(linea)
+        for inicio, fin1, fin2 in values:
+            texto_extraido = extract_text(linea, inicio, fin1, fin2)
+            if texto_extraido:
+                #print(linea)
+                print(inicio+' '+fin1+' '+fin2+' '+texto_extraido)
+                Valores_Obtenidos.append(texto_extraido)
+
+    
+
+    # Datos que deseas copiar en la columna B
+    datos = ["10",
+            "22",
+            "150",
+            "156",
+            "151",
+            "157",
+            "12",
+            "152",
+            "153",
+            "14",
+            "15",
+            "23",
+            "154",
+            "158",
+            "155",
+            "159",
+            "17",
+            "18",
+            "21",
+            "24",
+            "160",
+            "161",
+            "26",
+            "27",
+            "162",
+            "163",
+            "29",
+            "30",
+            "31",
+            "32",
+            "35",
+            "38",
+            "33",
+            "36",
+            "39",
+            "164",
+            "165",
+            "34",
+            "37",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "166",
+            "167",
+            "47",
+            "48",
+            "49",
+            "168",
+            "50",
+            "55",
+            "51",
+            "52",
+            "169",
+            "56",
+            "53",
+            "57",
+            "54",
+            "58",
+            "59",
+            "65",
+            "60",
+            "66",
+            "61",
+            "62",
+            "63",
+            "64",
+            "170"]
+
+    # Copiar los datos en el excel
+    
+    
+    
+    for i, dato in enumerate(datos, start=1):
+        sheet.cell(row=i, column = columna1).value = dato
+        
+    for i, dato in enumerate(Valores_Obtenidos, start=1):
+        sheet.cell(row=i,column = columna2).value = dato
+    
+    columna1 = columna1+2
+    columna2 = columna2+2
+
+
+
 
 # Guardar el archivo de Excel con los datos copiados
 # Create a Tkinter root window
