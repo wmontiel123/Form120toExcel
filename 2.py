@@ -1,24 +1,16 @@
-""" def calculator(expression):
-    try:
-        result = eval(expression)
-        return result
-    except Exception:
-        return "Invalid expression"
-
-
-# Example usage
-expression = input("Enter an expression: ")
-result = calculator(expression)
-print("Result:", result)
- """
 import re
 import openpyxl
 
 
 def encontrar_decimales(expresion, decimales):
     # Reemplazar "DD" por los números decimales encontrados
-    for decimal in decimales:
-        expresion = expresion.replace("DD", decimal, 1)
+    try:
+        for decimal in decimales:
+         expresion = expresion.replace("DD", decimal, 1)
+    
+    except:
+        expresion = expresion
+    
     
     return expresion
 
@@ -31,12 +23,39 @@ def evaluate_expression(expression, dictionary):
     # Reemplazar los decimales por "DD" en la expresión
     expresion_modificada = re.sub(patron, "DD", expression)
     
-    for key, value in dictionary.items():
-        expresion_modificada = expresion_modificada.replace(key, str(value))
+
+    numeros_y_signos = re.findall(r'[+\-*/()]|\d+(?:\.\d+)?|DD', expresion_modificada)
+
+ 
+    
+    
+    n_y_s = ''
+    
+    for numero in numeros_y_signos:
+        for key, value in dictionary.items():
+            if str(key) == str(numero):
+                numero = numero.replace(str(key), str(value))
+                numero = '('+numero+')'
+                break
+    
+    
+    
         
+        n_y_s = n_y_s + numero
         
+            
+  
+    
+    expresion_modificada = n_y_s      
+    
+    
+    
+    
+    
+    
     expression = encontrar_decimales(expresion_modificada,decimales)
-        
+       
+
 
     return eval(expression)
 
@@ -71,19 +90,7 @@ for row in sheet2.iter_rows(min_row=2,values_only=True):
 for row in sheet3.iter_rows(min_row=2, values_only=True):
     renglon = row[0]
     formula = row[1]
-    
 
-
-    
-
-
-expression_str = input("Enter the expression: ")
-value_dict = {
-    '1': 100,
-    '2': 5,
-    '3': 7,
-    '4': 3
-}
-
-result = evaluate_expression(expression_str, value_dict)
-print("Result:", result)
+  
+    result = evaluate_expression(str(formula).replace(',','.'), grupos.copy())
+    print("Result:", result)
