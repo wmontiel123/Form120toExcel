@@ -66,7 +66,16 @@ for row in sheet2.iter_rows(min_row=2,values_only=True):
         grupos[grupo] = monto
 
 
-print(grupos)
+
+# Procesa las fórmulas en la pestaña 3 y guarda los resultados en la pestaña 2
+for row in sheet3.iter_rows(min_row=2, values_only=True):
+    renglon = row[0]
+    formula = row[1]
+    
+
+
+    
+
 
 expression_str = input("Enter the expression: ")
 value_dict = {
