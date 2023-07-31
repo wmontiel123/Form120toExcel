@@ -26,9 +26,6 @@ def evaluate_expression(expression, dictionary):
 
     numeros_y_signos = re.findall(r'[+\-*/()]|\d+(?:\.\d+)?|DD', expresion_modificada)
 
- 
-    
-    
     n_y_s = ''
     
     for numero in numeros_y_signos:
@@ -40,16 +37,10 @@ def evaluate_expression(expression, dictionary):
     
     
     
-        
         n_y_s = n_y_s + numero
         
             
-  
-    
     expresion_modificada = n_y_s      
-    
-    
-    
     
     
     
