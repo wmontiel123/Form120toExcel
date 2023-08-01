@@ -10,8 +10,7 @@ def encontrar_decimales(expresion, decimales):
     
     except:
         expresion = expresion
-    
-    
+
     return expresion
 
 def evaluate_expression(expression, dictionary):
