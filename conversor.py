@@ -167,10 +167,11 @@ for file_path in pdf_files:
         ("Impuesto63", "", ""),
         ("IRP 64 ", "", ""),
         ("IRP170 ", "", ""),
-        ("PERIODO ATRIBUIDAS A EXPORTACION", "", ""),
+        #Anexo Exportador
+        #("PERIODO ATRIBUIDAS A EXPORTACION", "", ""),
         ("industrializacion171", " 181 ", "0181 "),
-        ("exportacion172", " 177 ", "0177 "),
-        ("anticipadamente173", " 183 ", "0183 ")
+        ("servicios atribuido directamente a exportacion172", " 177 ", "0177 "),
+        ("anticipadamente173", " 183 ", "0183 "),
         ("exportaciones174", " 178 ", "0178 "),
         ("exportaciones175", " 179 ", "0179 "),
         ("exportaciones176", " 180 ", "0180 "),
@@ -193,6 +194,57 @@ for file_path in pdf_files:
         (" 0184 ", "", ""),
         (" 185 ", "", ""),
         (" 0185 ", "", ""),
+        (" 186 ", "", ""),
+        (" 0186 ", "", ""),
+        ("servicios atribuido directamente a fletes de exportacion187 ", " 195 ", "0195 "),
+        ("exportacion188", " 196 ", "0196 "),
+        ("exoneradas o no alcanzadas y fletes de exportacion189", " 197 ", "0197 "),
+        ("exportacion190", " 198 ", "0198 "),
+        ("exportacion191", " 199 ", "0199 "),
+        ("en el mercado interno y fletes de exportacion192", " 200 ", "0200 "),
+        ("exoneradas o no alcanzadas y fletes de exportacion193", " 201 ", "0203 "),
+        ("de exportacion194", " 202 ", "0202 "),
+        ("de exportacion194", " 202 ", "0202 "),
+        (" 195 ", " 203 ", "0203 "),
+        (" 0195 ", " 203 ", "0203 "),
+        (" 196 ", " 204 ", "0204 "),
+        (" 0196 ", " 204 ", "0204 "),
+        (" 197 ", " 205 ", "0205 "),
+        (" 0197 ", " 205 ", "0205 "),
+        (" 198 ", " 206 ", "0206 "),
+        (" 0198 ", " 206 ", "0206 "),
+        (" 199 ", " 207 ", "0207 "),
+        (" 0199 ", " 207 ", "0207 "),
+        (" 200 ", " 208 ", "0208 "),
+        (" 0200 ", " 208 ", "0208 "),
+        (" 201 ", " 209 ", "0209 "),
+        (" 0201 ", " 209 ", "0209 "),
+        (" 202 ", " 210 ", "0210 "),
+        (" 0202 ", " 210 ", "0210 "),
+        (" 203 ", "", ""),
+        (" 0203 ", "", ""),
+        (" 204 ", "", ""),
+        (" 0204 ", "", ""),
+        (" 205 ", "", ""),
+        (" 0205 ", "", ""),
+        (" 206 ", "", ""),
+        (" 0206 ", "", ""),
+        (" 207 ", "", ""),
+        (" 0207 ", "", ""),
+        (" 208 ", "", ""),
+        (" 0208 ", "", ""),
+        (" 209 ", "", ""),
+        (" 0209 ", "", ""),
+        (" 210 ", "", ""),
+        (" 0210 ", "", ""),
+        ("(Proviene de la casilla 182)211", "", ""),
+        ("(Proviene de la casilla 203)212", "", ""),
+        ("IVA Credito atribuido proporcionalmente a exportacion (Proviene de la casilla 218 de la Hoja de calculo) 213", "", ""),
+        ("(Proviene de la suma de las casillas 211+212+213)214", "", ""),
+        ("solicitudes de devolucion del IVA Credito del Exportador presentadas en el periodo anterior al que se liquida)215", "", ""),
+        ("2/2Importe del IVA Credito por exportacion aplicado al mercado interno 148", "", ""),
+        ("(Casillas 214+215-148)149", "", "")
+        
         
     ]
 
@@ -209,6 +261,7 @@ for file_path in pdf_files:
     Mes_Año = ''
     Tipo_declaracion = ''
     Normalizada = ''
+    Anexo_Exportador = 'NO'
     
     for i in range(len(lineas_pdf)-1):
         if lineas_pdf[i].startswith("Mes Año"):
@@ -228,6 +281,12 @@ for file_path in pdf_files:
     
     for line in lineas_pdf:
         print(line)
+        
+        if line.startswith("COMPRAS LOCALES E IMPORTACIONES DEL"):
+            Anexo_Exportador = re.search(r'COMPRAS LOCALES E IMPORTACIONES DEL\s+(\d+)', line)
+            if Anexo_Exportador:
+                Anexo_Exportador = 'SI'
+            
         
         if line.startswith("Número de Orden"):
             Orden = re.search(r'Número de Orden\s+(\d+)', line)
@@ -262,21 +321,30 @@ for file_path in pdf_files:
     
     # Imprimir las líneas del PDF
     
-    print(Tipo_declaracion)
+    #print(Tipo_declaracion)
      
     for linea in lineas_pdf:
         
         for inicio, fin1, fin2 in values:
             texto_extraido = extract_text(linea, inicio, fin1, fin2)
             if texto_extraido:
+                
                 #print(linea)
-                #print(inicio+' '+fin1+' '+fin2+' '+texto_extraido)
+                
+                #print(inicio+' '+fin1+' '+fin2+' ')
+                
+                #print(texto_extraido)
+                
                 Valores_Obtenidos.append(texto_extraido)
+                
+                
 
     
 
     # Datos que deseas copiar en la columna B
-    datos = ["10",
+    datos = []
+    if Anexo_Exportador == 'NO':
+        datos = ["10",
             "22",
             "150",
             "156",
@@ -344,52 +412,70 @@ for file_path in pdf_files:
             "62",
             "63",
             "64",
-            "170",
+            "170"
+        ]
+    else:
+       datos = [   
             "171",
-            "172",
-            "173",
-            "174",
-            "175",
-            "176",
-            "177",
-            "178",
-            "179",
-            "180",
             "181",
+            "172",
+            "177",
             "182",
+            "173",
             "183",
+            "174",
+            "178",
             "184",
+            "175",
+            "179",
             "185",
+            "176",
+            "180",
             "186",
             "187",
-            "188",
-            "189",
-            "190",
-            "191",
-            "192",
-            "193",
-            "194",
             "195",
-            "196",
-            "197",
-            "198",
-            "199",
-            "200",
-            "201",
-            "202",
             "203",
+            "188",
+            "196",
             "204",
+            "189",
+            "197",
             "205",
+            "190",
+            "198",
             "206",
+            "191",
+            "199",
             "207",
+            "192",
+            "200",
             "208",
+            "193",
+            "201",
             "209",
+            "194",
+            
+            
+            
+           
+            
+            
+            "202",
+            
+            
+            
+            
+            
+            
+            
             "210",
             "211",
             "212",
             "213",
             "214",
-            "215"
+            "215",
+            "148",
+            "149"
             ]
 
     # Copiar los datos en el excel
@@ -410,14 +496,16 @@ for file_path in pdf_files:
     sheet.cell(row = 6, column = columna2).value = Mes_Año
     
     if Tipo_declaracion == '0':
-        sheet.cell(row = 6, column = columna2).value = 'ORIGINAL'
+        sheet.cell(row = 7, column = columna2).value = 'ORIGINAL'
     else:
-        sheet.cell(row = 6, column = columna2).value = 'RECTIFICATIVA'
+        sheet.cell(row = 7, column = columna2).value = 'RECTIFICATIVA'
     
-    for i, dato in enumerate(datos, start=7):
+    for i, dato in enumerate(datos, start=9):
+        print(dato)
         sheet.cell(row=i, column = columna1).value = dato
         
-    for i, dato in enumerate(Valores_Obtenidos, start=7):
+    for i, dato in enumerate(Valores_Obtenidos, start=8):
+        print(dato)
         sheet.cell(row=i,column = columna2).value = dato
     
     columna1 = columna1+2
