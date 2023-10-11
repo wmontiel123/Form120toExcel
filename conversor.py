@@ -8,27 +8,37 @@ import os
 
 
 def convertir_fecha(fecha):
-    partes = fecha.split()
-    mes = partes[0].rjust(2, '0')
-    anio = ''.join(partes[2:])
-    fecha_convertida = f"{mes}-{anio}"
+    fecha_convertida = fecha
+    try:
+        partes = fecha.split()
+        mes = partes[0].rjust(2, '0')
+        anio = ''.join(partes[2:])
+        fecha_convertida = f"{mes}-{anio}"
+    except:
+        pass
+    
     return fecha_convertida
 
 def get_pdf_files(folder_path):
     pdf_files = []
-    for file_name in os.listdir(folder_path):
-        if file_name.endswith('.pdf'):
-            pdf_files.append(file_name)
+    try:
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith('.pdf'):
+                pdf_files.append(file_name)
+    except:
+        pass
     return pdf_files
 
 def leer_pdf(ruta):
     lineas = []
-    with open(ruta, 'rb') as archivo:
-        lector_pdf = PyPDF2.PdfReader(archivo)
-        for pagina in lector_pdf.pages:
-            contenido = pagina.extract_text()
-            lineas.extend(contenido.split('\n'))
-            
+    try:
+        with open(ruta, 'rb') as archivo:
+            lector_pdf = PyPDF2.PdfReader(archivo)
+            for pagina in lector_pdf.pages:
+                contenido = pagina.extract_text()
+                lineas.extend(contenido.split('\n'))
+    except:
+        pass
 
     return lineas
 
@@ -181,7 +191,6 @@ for file_path in pdf_files:
         (" 0178 ", " 184 ", "0184 "),
         (" 179 ", " 185 ", "0185 "),
         (" 0179 ", " 185 ", "0185 "),
-        (" 0179 ", " 185 ", "0185 "),
         (" 180 ", " 186 ", "0186 "),
         (" 0180 ", " 186 ", "0186 "),
         (" 181 ", "", ""),
@@ -278,10 +287,11 @@ for file_path in pdf_files:
                 
             break
         
-    
+    numero_de_linea = 0
+    linea_contribuyente = 0
     for line in lineas_pdf:
-        print(line)
-        
+        #print(line)
+        numero_de_linea = numero_de_linea + 1
         if line.startswith("COMPRAS LOCALES E IMPORTACIONES DEL"):
             Anexo_Exportador = re.search(r'COMPRAS LOCALES E IMPORTACIONES DEL\s+(\d+)', line)
             if Anexo_Exportador:
@@ -290,8 +300,11 @@ for file_path in pdf_files:
         
         if line.startswith("Número de Orden"):
             Orden = re.search(r'Número de Orden\s+(\d+)', line)
+            linea_contribuyente = numero_de_linea
             if Orden:
                 Orden = Orden.group(1)
+                
+        
             
         if line.startswith("Formulario"):
             # Extract Contribuyente using regular expression
@@ -308,6 +321,7 @@ for file_path in pdf_files:
             fecha = re.search(r'Fecha:\s+([\d/]+\s+[\d:]+)', line)
             if fecha:
                 fecha = fecha.group(1)
+           
         
         if line.startswith("02Declaración Jurada Rectificativa 03"):
             # Extract Contribuyente using regular expression
@@ -322,7 +336,7 @@ for file_path in pdf_files:
     # Imprimir las líneas del PDF
     
     #print(Tipo_declaracion)
-     
+    DV = lineas_pdf[linea_contribuyente]
     for linea in lineas_pdf:
         
         for inicio, fin1, fin2 in values:
@@ -331,9 +345,10 @@ for file_path in pdf_files:
                 
                 #print(linea)
                 
-                #print(inicio+' '+fin1+' '+fin2+' ')
+                #print(inicio)
                 
                 #print(texto_extraido)
+                #print(linea)
                 
                 Valores_Obtenidos.append(texto_extraido)
                 
@@ -454,20 +469,7 @@ for file_path in pdf_files:
             "201",
             "209",
             "194",
-            
-            
-            
-           
-            
-            
             "202",
-            
-            
-            
-            
-            
-            
-            
             "210",
             "211",
             "212",
@@ -489,7 +491,7 @@ for file_path in pdf_files:
     sheet.cell(row = 7, column = columna1).value = 'Tipo Declaracion'
     
     sheet.cell(row = 1, column = columna2).value = ''
-    sheet.cell(row = 2, column = columna2).value = contribuyente
+    sheet.cell(row = 2, column = columna2).value = contribuyente + '-' + DV
     sheet.cell(row = 3, column = columna2).value = control
     sheet.cell(row = 4, column = columna2).value = convertir_fecha(fecha)
     sheet.cell(row = 5, column = columna2).value = Orden
@@ -500,12 +502,12 @@ for file_path in pdf_files:
     else:
         sheet.cell(row = 7, column = columna2).value = 'RECTIFICATIVA'
     
-    for i, dato in enumerate(datos, start=9):
-        print(dato)
+    for i, dato in enumerate(datos, start=8):
+        #print(dato)
         sheet.cell(row=i, column = columna1).value = dato
         
     for i, dato in enumerate(Valores_Obtenidos, start=8):
-        print(dato)
+        #print(dato)
         sheet.cell(row=i,column = columna2).value = dato
     
     columna1 = columna1+2
@@ -520,7 +522,7 @@ root = tk.Tk()
 root.withdraw()  # Hide the root window
 
 # Open the file dialog to select a file path for saving
-file_path = filedialog.asksaveasfilename()
+file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=(("xlsx file", "*.xlsx"),("All Files", "*.*") ))
 
 # Print the selected file path
 print("Selected File Path for Saving:", file_path)
